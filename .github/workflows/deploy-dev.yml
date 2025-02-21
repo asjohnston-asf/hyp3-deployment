@@ -41,8 +41,7 @@ jobs:
         run: |
           aws cloudformation package \
             --template-file hyp3/apps/main-cf.yml \
-            --s3-bucket asj-dev \
-            --s3-prefix cloudformation \
+            --s3-bucket cf-templates-1hz9ldhhl4ahu-us-west-2 \
             --output-template-file packaged.yml
           aws cloudformation deploy \
             --stack-name asj-dev \
