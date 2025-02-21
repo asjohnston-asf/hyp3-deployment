@@ -1,6 +1,6 @@
 name: Deploy dev stack to AWS
 
-on: workflow-dispatch
+on: workflow_dispatch
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
