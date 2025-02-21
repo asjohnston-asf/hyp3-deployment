@@ -1,0 +1,20 @@
+{
+  "Parameters": {
+    "VpcId": ",${{ secrets.VPC_ID }}",
+    "SubnetIds": "${{ secrets.SUBNET_IDS }}",
+    "SecretArn": "${{ secrets.SECRET_ARN }}",
+    "ImageTag": "${{ matrix.IMAGE_TAG }}",
+    "ProductLifetimeInDays": "${{ matrix.product_lifetime_in_days }} ",
+    "AuthPublicKey": "${{ secrets.AUTH_PUBLIC_KEY }}",
+    "DefaultCreditsPerUser": "${{ matrix.default_credits_per_user }}",
+    "DefaultApplicationStatus": "${{ matrix.default_application_status }}",
+    "AmiId": "${{ matrix.ami_id }}",
+    "DefaultMaxvCpus": "${{ matrix.default_max_vcpus }}",
+    "ExpandedMaxvCpus": "${{ matrix.expanded_max_vcpus }}",
+    "MonthlyBudget": "${{ secrets.MONTHLY_BUDGET }}",
+    "RequiredSurplus": "${{ matrix.required_surplus }}",
+    "InstanceTypes": "${{ matrix.instance_types }}",
+    "BucketReadPrincipals": "${{ secrets.BUCKET_READ_PRINCIPALS }}",
+    "DistributionUrl": "${{ matrix.distribution_url }}"
+  }
+}

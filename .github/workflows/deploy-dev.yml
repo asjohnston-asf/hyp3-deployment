@@ -1,0 +1,52 @@
+name: Deploy dev stack to AWS
+
+on: workflow-dispatch
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: dev
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: actions/checkout@v4.2.2
+        with:
+          repository: ASFHyP3/HyP3
+          ref: develop
+          path: hyp3/
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - run: |
+          pip install --upgrade pip
+          cd hyp3
+          make install
+          make files='job_spec/INSAR_ISCE_BURST.yml job_spec/AUTORIFT.yml security_environment=ASF api_name=asj-dev cost_profile=Default build
+
+      - name: Package and deploy
+        shell: bash
+        run: |
+          aws cloudformation package \
+            --template-file hyp3/apps/main-cf.yml \
+            --s3-bucket asj-dev \
+            --s3-prefix cloudformation \
+            --output-template-file packaged.yml
+          aws cloudformation deploy \
+            --stack-name asj-dev \
+            --template-file packaged.yml \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides file://dev.json
