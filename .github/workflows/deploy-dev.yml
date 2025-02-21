@@ -34,7 +34,7 @@ jobs:
           pip install --upgrade pip
           cd hyp3
           make install
-          make files='job_spec/INSAR_ISCE_BURST.yml job_spec/AUTORIFT.yml security_environment=ASF api_name=asj-dev cost_profile=Default build
+          make files='job_spec/INSAR_ISCE_BURST.yml job_spec/AUTORIFT.yml' security_environment=ASF api_name=asj-dev cost_profile=Default build
 
       - name: Package and deploy
         shell: bash
