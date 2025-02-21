@@ -36,6 +36,15 @@ jobs:
           make install
           make files='job_spec/INSAR_ISCE_BURST.yml job_spec/AUTORIFT.yml' security_environment=ASF api_name=asj-dev cost_profile=DEFAULT build
 
+      - env:
+          VPC_ID: ${{ secrets.VPC_ID }}
+          SUBNET_IDS: ${{ secrets.SUBNET_IDS }}
+          SECRET_ARN: ${{ secrets.SECRET_ARN }}
+          AUTH_PUBLIC_KEY: ${{ secrets.AUTH_PUBLIC_KEY }}
+          CERTIFICATE_ARN: ${{ secrets.CERTIFICATE_ARN }}
+        run: |
+          envsubst < dev.json > parameters.json
+
       - name: Package and deploy
         shell: bash
         run: |
@@ -47,4 +56,4 @@ jobs:
             --stack-name asj-dev \
             --template-file packaged.yml \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides file://dev.json
+            --parameter-overrides file://parameters.json
