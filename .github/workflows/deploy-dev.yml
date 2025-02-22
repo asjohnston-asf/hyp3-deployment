@@ -1,15 +1,17 @@
 name: Deploy dev stack to AWS
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    environment:
+      description: 'Environment to deploy'
+      type: environment
+      required: true
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency: ${{ inputs.environment }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    environment:
-      name: dev
 
     steps:
       - uses: actions/checkout@v4.2.2
@@ -17,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4.2.2
         with:
           repository: ASFHyP3/HyP3
-          ref: develop
+          ref: ${{ vars.HYP3_BRANCH }}
           path: hyp3/
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -34,27 +36,34 @@ jobs:
           pip install --upgrade pip
           cd hyp3
           make install
-          make files='job_spec/INSAR_ISCE_BURST.yml job_spec/AUTORIFT.yml' security_environment=ASF api_name=asj-dev cost_profile=DEFAULT build
-
-      - env:
-          VPC_ID: ${{ secrets.VPC_ID }}
-          SUBNET_IDS: ${{ secrets.SUBNET_IDS }}
-          SECRET_ARN: ${{ secrets.SECRET_ARN }}
-          AUTH_PUBLIC_KEY: ${{ secrets.AUTH_PUBLIC_KEY }}
-          CERTIFICATE_ARN: ${{ secrets.CERTIFICATE_ARN }}
-        run: |
-          envsubst < dev.json > parameters.json
+          make files='${{ vars.JOB_FILES }}' security_environment=${{ vars.SECURITY_ENVIRONMENT }} api_name=${{ vars.API_NAME }} cost_profile=${{ vars.COST_PROFILE }} build
 
       - name: Package and deploy
         shell: bash
         run: |
           aws cloudformation package \
             --template-file hyp3/apps/main-cf.yml \
-            --s3-bucket cf-templates-1hz9ldhhl4ahu-us-west-2 \
+            --s3-bucket ${{ vars.TEMPLATE_BUCKET }} \
             --output-template-file packaged.yml
           aws cloudformation deploy \
-            --stack-name asj-dev \
+            --stack-name ${{ vars.STACK_NAME }} \
             --role-arn ${{ secrets.CLOUDFORMATION_ROLE_ARN }} \
             --template-file packaged.yml \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides file://parameters.json
+            --parameter-overrides \
+                VpcId='${{ secrets.VPC_ID }}' \
+                SubnetIds='${{ secrets.SUBNET_IDS }}' \
+                SecretArn='${{ secrets.SECRET_ARN }}' \
+                AuthPublicKey='${{ secrets.AUTH_PUBLIC_KEY }}' \
+                CertificateArn='${{ secrets.CERTIFICATE_ARN }}' \
+                ImageTag='${{ vars.IMAGE_TAG }}' \
+                ProductLifetimeInDays='${{ vars.PRODUCT_LIFETIME_IN_DAYS }}' \
+                DefaultCreditsPerUser='${{ vars.DEFAULT_CREDITS_PER_USER }}' \
+                DefaultApplicationStatus='${{ vars.DEFAULT_APPLICATION_STATUS }}' \
+                AmiId='${{ vars.AMI_ID }}' \
+                DefaultMaxvCpus='${{ vars.DEFAULT_MAX_VCPUS }}' \
+                ExpandedMaxvCpus='${{ vars.EXTENDED_MAX_VCPUS }}' \
+                MonthlyBudget='${{ vars.MONTHLY_BUDGET }}' \
+                RequiredSurplus='${{ vars.REQUIRED_SURPLUS }}' \
+                InstanceTypes='${{ vars.INSTANCE_TYPES }}' \
+                DomainName='${{ vars.DOMAIN_NAME }}'
