@@ -1,4 +1,4 @@
-name: Deploy dev stack to AWS
+name: Deploy a copy of HyP3 to AWS
 
 on:
   workflow_dispatch:
@@ -18,12 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.2.2
-
-      - uses: actions/checkout@v4.2.2
         with:
           repository: ASFHyP3/HyP3
           ref: ${{ vars.HYP3_BRANCH }}
-          path: hyp3/
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -37,7 +34,6 @@ jobs:
 
       - run: |
           pip install --upgrade pip
-          cd hyp3
           make install
           make files='${{ vars.JOB_FILES }}' security_environment=${{ vars.SECURITY_ENVIRONMENT }} api_name=${{ vars.API_NAME }} cost_profile=${{ vars.COST_PROFILE }} build
 
@@ -45,7 +41,7 @@ jobs:
         shell: bash
         run: |
           aws cloudformation package \
-            --template-file hyp3/apps/main-cf.yml \
+            --template-file apps/main-cf.yml \
             --s3-bucket ${{ vars.TEMPLATE_BUCKET }} \
             --output-template-file packaged.yml
           aws cloudformation deploy \
