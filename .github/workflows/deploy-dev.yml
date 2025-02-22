@@ -54,6 +54,7 @@ jobs:
             --output-template-file packaged.yml
           aws cloudformation deploy \
             --stack-name asj-dev \
+            --role-arn ${{ secrets.CLOUDFORMATION_ROLE_ARN }} \
             --template-file packaged.yml \
             --capabilities CAPABILITY_IAM \
             --parameter-overrides file://parameters.json
