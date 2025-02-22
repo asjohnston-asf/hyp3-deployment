@@ -37,9 +37,7 @@ jobs:
           make install
           make files='${{ vars.JOB_FILES }}' security_environment=${{ vars.SECURITY_ENVIRONMENT }} api_name=${{ vars.API_NAME }} cost_profile=${{ vars.COST_PROFILE }} build
 
-      - name: Package and deploy
-        shell: bash
-        run: |
+      - run: |
           aws cloudformation package \
             --template-file apps/main-cf.yml \
             --s3-bucket ${{ vars.TEMPLATE_BUCKET }} \
