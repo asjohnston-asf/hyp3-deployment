@@ -2,10 +2,11 @@ name: Deploy dev stack to AWS
 
 on:
   workflow_dispatch:
-    environment:
-      description: 'Environment to deploy'
-      type: environment
-      required: true
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        type: environment
+        required: true
 
 concurrency: ${{ inputs.environment }}
 
