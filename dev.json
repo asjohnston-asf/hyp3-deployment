@@ -15,6 +15,6 @@
     "MonthlyBudget": "0",
     "RequiredSurplus": "0",
     "InstanceTypes": "r6id.xlarge,r6idn.xlarge",
-    "Domain": "hyp3-asj-dev.asf.alaska.edu"
+    "DomainName": "hyp3-asj-dev.asf.alaska.edu"
   }
 }
