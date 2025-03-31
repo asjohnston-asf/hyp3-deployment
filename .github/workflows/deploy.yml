@@ -24,7 +24,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - uses: actions/setup-python@v5
         with:
@@ -49,7 +49,7 @@ jobs:
                 VpcId='${{ secrets.VPC_ID }}' \
                 SubnetIds='${{ secrets.SUBNET_IDS }}' \
                 SecretArn='${{ secrets.SECRET_ARN }}' \
-                AuthPublicKey='${{ secrets.AUTH_PUBLIC_KEY }}' \
+                AuthPublicKey='${{ vars.AUTH_PUBLIC_KEY }}' \
                 CertificateArn='${{ secrets.CERTIFICATE_ARN }}' \
                 ImageTag='${{ vars.IMAGE_TAG }}' \
                 ProductLifetimeInDays='${{ vars.PRODUCT_LIFETIME_IN_DAYS }}' \
