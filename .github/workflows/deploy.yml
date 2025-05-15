@@ -40,6 +40,9 @@ jobs:
             --template-file apps/main-cf.yml \
             --s3-bucket ${{ vars.TEMPLATE_BUCKET }} \
             --output-template-file packaged.yml
+
+      - if: vars.SECURITY_ENVIRONMENT != 'EDC'
+        run: |
           aws cloudformation deploy \
             --stack-name ${{ vars.STACK_NAME }} \
             --role-arn ${{ secrets.CLOUDFORMATION_ROLE_ARN }} \
@@ -61,4 +64,30 @@ jobs:
                 MonthlyBudget='${{ vars.MONTHLY_BUDGET }}' \
                 RequiredSurplus='${{ vars.REQUIRED_SURPLUS }}' \
                 InstanceTypes='${{ vars.INSTANCE_TYPES }}' \
-                DomainName='${{ vars.DOMAIN_NAME }}'
+                DomainName='${{ vars.DOMAIN_NAME }}' \
+                OperaRtcS1EndDate='${{ vars.OPERA_RTC_S1_END_DATE }}'
+
+      - if: vars.SECURITY_ENVIRONMENT == 'EDC'
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${{ vars.STACK_NAME }} \
+            --template-file packaged.yml \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides \
+                VpcId='${{ secrets.VPC_ID }}' \
+                SubnetIds='${{ secrets.SUBNET_IDS }}' \
+                SecretArn='${{ secrets.SECRET_ARN }}' \
+                AuthPublicKey='${{ vars.AUTH_PUBLIC_KEY }}' \
+                ImageTag='${{ vars.IMAGE_TAG }}' \
+                ProductLifetimeInDays='${{ vars.PRODUCT_LIFETIME_IN_DAYS }}' \
+                DefaultCreditsPerUser='${{ vars.DEFAULT_CREDITS_PER_USER }}' \
+                DefaultApplicationStatus='${{ vars.DEFAULT_APPLICATION_STATUS }}' \
+                AmiId='${{ vars.AMI_ID }}' \
+                DefaultMaxvCpus='${{ vars.DEFAULT_MAX_VCPUS }}' \
+                ExpandedMaxvCpus='${{ vars.EXTENDED_MAX_VCPUS }}' \
+                MonthlyBudget='${{ vars.MONTHLY_BUDGET }}' \
+                RequiredSurplus='${{ vars.REQUIRED_SURPLUS }}' \
+                InstanceTypes='${{ vars.INSTANCE_TYPES }}' \
+                BucketReadPrincipals='${{ vars.BUCKET_READ_PRINCIPALS }}' \
+                DistributionUrl='${{ vars.DISTRIBUTION_URL }}' \
+                OperaRtcS1EndDate='${{ vars.OPERA_RTC_S1_END_DATE }}'
